@@ -1,0 +1,19 @@
+service: school-notes-api
+frameworkVersion: ">=1.28.0"
+provider:
+  name: aws
+  runtime: go1.x
+  region: eu-north-1
+  stage: ${opt:stage}
+functions:
+  api:
+    handler: main.go
+    events: 
+      - http:
+          path: /ping
+          method: GET
+
+package:
+  patterns:
+    - '!*/**'
+    - .
