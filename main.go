@@ -15,7 +15,7 @@ import (
 var ginLambda *ginadapter.GinLambda
 
 
-func Init(){
+func init(){
 	// stdout and stderr are sent to AWS CloudWatch Logs
 	log.Printf("Gin cold start")
 
@@ -57,7 +57,7 @@ func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 
 func main() {
 	// since we are deploying to lambda we should
-	Init()
+	// init()
 	lambda.Start(Handler)
 }
 
