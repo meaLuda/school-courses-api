@@ -12,12 +12,10 @@ import (
 func Init(){
 	// stdout and stderr are sent to AWS CloudWatch Logs
 	log.Printf("Gin cold start")
-
-	r := gin.Default()
 	err := models.ConnectDb()
 	CheckErr(err)
-	// Test_db_conntection_getNotes()
-	// //API v1
+	r := gin.Default()
+
 
 	// test connection
 	r.GET("/ping", func(ctx *gin.Context) {
@@ -25,16 +23,11 @@ func Init(){
 			"message":"pong",
 		})
 	})
-	v1 := r.Group("/api/college_app/v1")
+	v1 := r.Group("/api/college_app/v1/")
 	{
+		v1.GET("all_diplomas/:dpID",getDiplomaByDepartment)
 		v1.GET("all_modules/:id",get_DiplomaModule) // http://localhost:8080/api/college_app/v1/all_modules/32
-		v1.GET("sub_modules/:diploma_id",get_DiplomaSubModule) // http://localhost:8080/api/college_app/v1/sub_modules/32/4
-		v1.GET("sub_modules/with_module/:diploma_id/:module_id",get_DiplomaSubModule_ModeID) // http://localhost:8080/api/college_app/v1/sub_modules/32/4
-		v1.GET("sub_modules/notes/:diploma_id/:module_id/:sub_module_id",get_DiplomaSubModule_Notes) // http://localhost:8080/api/college_app/v1/sub_modules/notes
-		//   v1.POST("person", addPerson)
-		//   v1.PUT("person/:id", updatePerson)
-		//   v1.DELETE("person/:id", deletePerson)
-		//   v1.OPTIONS("person", options)
+		v1.GET("modules/notes/:diploma_id/:module_id",get_DiplomaModule_Notes) // http://localhost:8080/api/college_app/v1/sub_modules/notes
 	}
 
 	

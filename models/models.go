@@ -1,8 +1,8 @@
 package models
 
 import (
-	_ "github.com/mattn/go-sqlite3"
 	"strconv"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 // ----------------------------------------------  structs for college --------------------------------
@@ -23,29 +23,46 @@ type CollegeModuleFields struct {
 	DiplomaID int    `json:"diploma_id"`
 }
 
-type CollegeSubmoduleFields struct {
-	ID        int    `json:"id"`
-	Title     string `json:"title"`
-	ModuleID  int    `json:"module_id"`
-	DiplomaID int    `json:"diploma_id"`
-}
-
 type CollegeCourseContentNotesFields struct {
 	ID          int    `json:"id"`
 	Title       string `json:"title"`
 	NotesPdf    string `json:"notes_pdf"`
 	DiplomaID   int    `json:"diploma_id"`
 	ModuleID    int    `json:"module_id"`
-	SubModuleID int    `json:"sub_module_id"`
+	// SubModuleID int    `json:"sub_module_id"`
 }
 
-// Constant Table Names:
-const collegeDepertmantTable string = "CollegeDepertment"
-const collegeDiplomaTable string = "CollegeDiploma"
-const collegeDiplomaModuleTable string = "CollegeDiploma_Module"
-const collegeDipModuleContentTable string = "CollegeDiploma_Submodule"
-
 // ---------------------------------------------- queries for college apps  --------------------------------
+
+// get diplomas by depertment ID
+func GetDiplomasByDepartment(departmentID int) ([]CollegeDiplomaFields, error) {
+	query := "SELECT * FROM CollegeDiploma WHERE depertment_id = ?"
+	rows, err := DB.Query(query, departmentID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close() //good habit to close
+
+	diplomas := make([]CollegeDiplomaFields, 0)
+
+	for rows.Next() {
+		singlDiploma := CollegeDiplomaFields{}
+
+		err := rows.Scan(&singlDiploma.ID, &singlDiploma.Title, &singlDiploma.DepertmentID)
+		if err != nil {
+			return nil, err
+		}
+
+		diplomas = append(diplomas, singlDiploma)
+	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+
+	return diplomas, err
+}
+
 func GetDiplomaModule(diploma_id int) ([]CollegeModuleFields, error) {
 	//query db
 	// 	SELECT * FROM "CollegeDiploma_Module"
@@ -54,9 +71,7 @@ func GetDiplomaModule(diploma_id int) ([]CollegeModuleFields, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	defer rows.Close()
-
 	modules := make([]CollegeModuleFields, 0)
 
 	for rows.Next() {
@@ -70,9 +85,8 @@ func GetDiplomaModule(diploma_id int) ([]CollegeModuleFields, error) {
 
 		modules = append(modules, singleModule)
 	}
-
+	
 	err = rows.Err()
-
 	if err != nil {
 		return nil, err
 	}
@@ -80,96 +94,23 @@ func GetDiplomaModule(diploma_id int) ([]CollegeModuleFields, error) {
 	return modules, err
 }
 
-func GetDiplomaSubModule_ModeID(diploma_id int, module_id int) ([]CollegeSubmoduleFields, error) {
-	//query db
-	// SELECT * FROM "CollegeDiploma_Submodule"
-	// WHERE   diploma_id=32 AND module_id=4;
-	rows, err := DB.Query("SELECT * FROM CollegeDiploma_Submodule WHERE diploma_id="+strconv.Itoa(diploma_id)+" AND module_id="+strconv.Itoa(module_id)+";")
-	if err != nil {
-		return nil, err
-	}
 
-	defer rows.Close()
-
-	subModule := make([]CollegeSubmoduleFields, 0)
-
-	for rows.Next() {
-		// create instances to be appended
-		singleSubModule := CollegeSubmoduleFields{}
-		err = rows.Scan(&singleSubModule.ID, &singleSubModule.Title, &singleSubModule.DiplomaID,&singleSubModule.ModuleID)
-
-		if err != nil {
-			return nil, err
-		}
-
-		subModule = append(subModule, singleSubModule)
-	}
-
-	err = rows.Err()
-
-	if err != nil {
-		return nil, err
-	}
-
-	return subModule, err
-
-}
-
-func GetDiplomaSubModule(diploma_id int) ([]CollegeSubmoduleFields, error) {
-	//query db
-	// SELECT * FROM "CollegeDiploma_Submodule"
-	// WHERE   diploma_id=32 AND module_id=4;
-	rows, err := DB.Query("SELECT * FROM CollegeDiploma_Submodule WHERE diploma_id="+strconv.Itoa(diploma_id)+";")
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-
-	subModule := make([]CollegeSubmoduleFields, 0)
-
-	for rows.Next() {
-		// create instances to be appended
-		singleSubModule := CollegeSubmoduleFields{}
-		err = rows.Scan(&singleSubModule.ID, &singleSubModule.Title, &singleSubModule.DiplomaID,&singleSubModule.ModuleID)
-
-		if err != nil {
-			return nil, err
-		}
-
-		subModule = append(subModule, singleSubModule)
-	}
-
-	err = rows.Err()
-
-	if err != nil {
-		return nil, err
-	}
-
-	return subModule, err
-
-}
-
-
-func GetDiplomaSubModuleNotes(diploma_id int,module_id int, sub_module_id int)([]CollegeCourseContentNotesFields, error){
+func GetDiplomaModuleNotes(diploma_id int,module_id int)([]CollegeCourseContentNotesFields, error){
 
 	//query db
-	// SELECT * FROM "CollegeDiploma_SubmoduleContent_notes"
-	// WHERE   diploma_id=32 AND module_id=4 AND sub_module_id=35;
-
-	rows, err := DB.Query("SELECT * FROM CollegeDiploma_SubmoduleContent_notes WHERE diploma_id="+strconv.Itoa(diploma_id)+" AND module_id="+strconv.Itoa(module_id)+" AND sub_module_id="+strconv.Itoa(sub_module_id)+";")
+	rows, err := DB.Query("SELECT * FROM CollegeDiploma_SubmoduleContent_notes WHERE diploma_id="+strconv.Itoa(diploma_id)+" AND module_id="+strconv.Itoa(module_id)+";")
 	if err != nil {
 		return nil, err
 	}
 
-	defer rows.Close()
+	defer DB.Close()
 
 	SubModulenotes := make([]CollegeCourseContentNotesFields, 0)
 
 	for rows.Next() {
 		// create instances to be appended
 		singleSubModuleNote := CollegeCourseContentNotesFields{}
-		err = rows.Scan(&singleSubModuleNote.ID, &singleSubModuleNote.Title, &singleSubModuleNote.NotesPdf,&singleSubModuleNote.DiplomaID,&singleSubModuleNote.ModuleID,&singleSubModuleNote.SubModuleID)
+		err = rows.Scan(&singleSubModuleNote.ID, &singleSubModuleNote.Title, &singleSubModuleNote.NotesPdf,&singleSubModuleNote.DiplomaID,&singleSubModuleNote.ModuleID)
 
 		if err != nil {
 			return nil, err
@@ -179,10 +120,9 @@ func GetDiplomaSubModuleNotes(diploma_id int,module_id int, sub_module_id int)([
 	}
 
 	err = rows.Err()
-
 	if err != nil {
 		return nil, err
 	}
-
+	rows.Close() //good habit to close
 	return SubModulenotes, err
 }

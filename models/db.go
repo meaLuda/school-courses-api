@@ -2,49 +2,30 @@ package models
 
 import (
 	"database/sql"
+	_ "github.com/mattn/go-sqlite3"
 	"log"
-	"sync"
+	// "sync"
 )
-
-// // global variable
-// var DB *sql.DB
-
-// func ConnectDb() error{
-// 	db, err := sql.Open("sqlite3","models/db.sqlite3")
-
-// 	// check when an error occurs
-// 	if err != nil{
-// 		log.Fatal(err)
-// 		return err
-// 	}
-
-// 	// Set value of DB to this new db
-// 	DB = db 
-// 	log.Println("--------- Connected to the database ------------------")
-// 	return nil
-// }
 
 var (
 	DB        *sql.DB
 	dbInitErr error
-	dbMutex   sync.Mutex
+	// dbMutex   sync.Mutex
 )
+const file string = "./db.sqlite3"
+
 
 func ConnectDb() error {
-	dbMutex.Lock() // lock on call
-	defer dbMutex.Unlock()
+	// dbMutex.Lock() // lock on call
+	// defer dbMutex.Unlock()
 
-	if DB != nil {
-		return nil // Already connected
-	}
-
-	db, err := sql.Open("sqlite3", "models/db.sqlite3")
+	db, err := sql.Open("sqlite3", file)
+	
 	if err != nil {
 		log.Fatal(err)
 		return err
 	}
-
 	DB = db
-	log.Println("--------- Connected to the database ------------------")
 	return nil
+	
 }
