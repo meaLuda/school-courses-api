@@ -1,17 +1,10 @@
-package models
+package main
 
 import (
 	"testing"
 	"fmt"
 	"log"
 )
-
-
-func CheckErr(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
 
 
 func TestGetDiplomas(t *testing.T) {

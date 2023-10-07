@@ -1,4 +1,4 @@
-package models
+package main
 
 import (
 	"strconv"
@@ -38,6 +38,7 @@ type CollegeCourseContentNotesFields struct {
 func GetDiplomasByDepartment(departmentID int) ([]CollegeDiplomaFields, error) {
 	query := "SELECT * FROM CollegeDiploma WHERE depertment_id = ?"
 	rows, err := DB.Query(query, departmentID)
+	
 	if err != nil {
 		return nil, err
 	}
@@ -64,14 +65,13 @@ func GetDiplomasByDepartment(departmentID int) ([]CollegeDiplomaFields, error) {
 }
 
 func GetDiplomaModule(diploma_id int) ([]CollegeModuleFields, error) {
-	//query db
-	// 	SELECT * FROM "CollegeDiploma_Module"
-	// WHERE   diploma_id=32;
 	rows, err := DB.Query("SELECT * FROM CollegeDiploma_Module WHERE diploma_id="+strconv.Itoa(diploma_id)+";")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
+	
+
 	modules := make([]CollegeModuleFields, 0)
 
 	for rows.Next() {
@@ -90,6 +90,9 @@ func GetDiplomaModule(diploma_id int) ([]CollegeModuleFields, error) {
 	if err != nil {
 		return nil, err
 	}
+	if len(modules) < 0 {
+		return nil, err
+	}
 
 	return modules, err
 }
@@ -103,7 +106,7 @@ func GetDiplomaModuleNotes(diploma_id int,module_id int)([]CollegeCourseContentN
 		return nil, err
 	}
 
-	defer DB.Close()
+	
 
 	SubModulenotes := make([]CollegeCourseContentNotesFields, 0)
 

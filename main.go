@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"collegeAPI/models"
+	// "collegeAPI/models"
 	"net/http"
 	"github.com/gin-gonic/gin"
 )
@@ -12,8 +12,9 @@ import (
 func Init(){
 	// stdout and stderr are sent to AWS CloudWatch Logs
 	log.Printf("Gin cold start")
-	err := models.ConnectDb()
+	err := ConnectDb()
 	CheckErr(err)
+	// defer DisconnectDb()
 	r := gin.Default()
 
 
@@ -23,10 +24,10 @@ func Init(){
 			"message":"pong",
 		})
 	})
-	v1 := r.Group("/api/college_app/v1/")
+	v1 := r.Group("/api/college_app/v1")
 	{
-		v1.GET("all_diplomas/:dpID",getDiplomaByDepartment)
-		v1.GET("all_modules/:id",get_DiplomaModule) // http://localhost:8080/api/college_app/v1/all_modules/32
+		v1.GET("all_diplomas/:dpmID",getDiplomaByDepartment)
+		v1.GET("all_modules/:dplid",get_DiplomaModule) // http://localhost:8080/api/college_app/v1/all_modules/32
 		v1.GET("modules/notes/:diploma_id/:module_id",get_DiplomaModule_Notes) // http://localhost:8080/api/college_app/v1/sub_modules/notes
 	}
 
